@@ -1,0 +1,23 @@
+---
+# tasks file for Install_Tomcat
+- name: Change hostname
+  hostname: 
+    name: '{{inventory_hostname}}'
+
+- name: Install Tomcat
+  yum:    
+    name: 
+      - tomcat
+      - tomcat-admin-webapps
+      - tomcat-webapps
+    state: latest
+  register: install
+
+- name: Change the line
+  lineinfile:
+            dest=/etc/tomcat/tomcat-users.xml
+            regexp='^<tomcat-users>'
+            line='<tomcat-users>\n<user username="{{tomcat_user}}" password="{{tomcat_pass}}" roles="manager-gui,admin-gui,manager-script"/>'
+            state=present
+  when: install|success
+  notify: Tomcat start

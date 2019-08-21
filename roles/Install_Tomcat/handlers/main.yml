@@ -1,0 +1,4 @@
+---
+# handlers file for Install_Tomcat
+- name: Tomcat start
+  service: name=tomcat state=started enabled=yes
