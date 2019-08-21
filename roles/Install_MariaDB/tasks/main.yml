@@ -1,0 +1,55 @@
+---
+# tasks file for Install_MariaDB
+- name: Change hostname
+  hostname: 
+     name: '{{inventory_hostname}}'
+
+- name: Copy Mariadb.repo to VM
+  template: 
+    src: /etc/ansible/roles/Install_MariaDB/templates/mariadb.j2 
+    dest: /etc/yum.repos.d/mariadb.repo
+  register: mariadb_repo
+
+- name: Install MariaDB-Galera-server
+  yum: 
+    name: 
+      - MariaDB-Galera-server 
+      - MariaDB-client 
+      - rsync 
+      - galera
+      - MySQL-python 
+    state: present 
+
+- name: mariadb start
+  service: name=mysql state=started enabled=yes
+  
+- name: Sets the root password 
+  mysql_user: user=root password="{{db_pass}}" host=localhost
+  ignore_errors: True
+
+- name: Grant Privileges
+  shell: echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '135790' WITH GRANT OPTION;" | mysql -u "{{db_user}}" -p"{{db_pass}}";
+
+- name: Flush privileges
+  shell: echo "FLUSH PRIVILEGES;" | mysql -u "{{db_user}}" -p"{{db_pass}}";
+
+- name: Stop MariaDB
+  service: 
+    name: mysql 
+    state: stopped
+    enabled: yes
+
+- name: Change Galera config
+  template: 
+    src: /etc/ansible/roles/Install_MariaDB/templates/galera.j2 
+    dest: /etc/my.cnf.d/server.cnf
+
+- name: Start MariaDB Galera Cluster node 1
+  shell: /etc/init.d/mysql bootstrap
+  when: inventory_hostname == "{{groups.mariadb[0]}}"
+
+- name: Start MariaDB Galera Cluster node 2 & 3
+  service: 
+    name: mysql
+    state: started
+    enabled: yes

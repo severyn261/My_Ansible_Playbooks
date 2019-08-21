@@ -1,0 +1,4 @@
+---
+# handlers file for Install_MariaDB
+- name: mariadb start
+  service: name=mysql state=started enabled=yes
