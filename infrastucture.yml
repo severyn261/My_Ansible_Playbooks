@@ -1,0 +1,49 @@
+---
+- name: Tomcat install
+  hosts: tomcat
+  become: yes
+
+  roles:
+   - Install_Tomcat
+
+- name: Nginx
+  hosts: nginx
+  become: yes
+
+  roles:
+   - Install_Nginx
+
+- name: HAProxy
+  hosts: haproxy
+  become: yes
+
+  roles:
+  - Install_Haproxy
+
+- name: MariaDB install
+  hosts: mariadb
+  become: yes
+
+  roles:
+  - Install_MariaDB
+
+- name: Dump database
+  hosts: mariadb
+  become: yes
+
+  roles:
+  - dump
+
+- name: Create VIP Nginx
+  hosts: nginx
+  become: yes
+
+  roles:
+  - VIP
+
+- name: Create VIP HAProxy
+  hosts: haproxy
+  become: yes
+
+  roles:
+  - VIPh
