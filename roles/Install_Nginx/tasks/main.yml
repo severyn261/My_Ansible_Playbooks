@@ -1,0 +1,29 @@
+---
+# tasks file for Install_Nginx
+- name: Change hostname
+  hostname: 
+     name: '{{inventory_hostname}}'
+
+- name: Epel
+  yum: name=epel-release state=latest
+
+- name: Install Nginx
+  yum:
+    name:
+      - nginx 
+      - pacemaker
+      - pcs
+      - resource-agents
+    state: present
+  register: install
+
+- name: Generate config file
+  template: 
+    src: /etc/ansible/roles/Install_Nginx/templates/nginx.j2 
+    dest: /etc/nginx/nginx.conf 
+    mode: 0555
+  when: install|success
+  notify: 
+    - Nginx start
+    - PCS start
+

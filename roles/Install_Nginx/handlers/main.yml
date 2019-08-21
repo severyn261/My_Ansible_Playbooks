@@ -1,0 +1,7 @@
+---
+# handlers file for Install_Nginx
+- name: Nginx start
+  service: name=nginx state=started enabled=yes
+
+- name: PCS start
+  service: name=pcsd state=started enabled=yes
