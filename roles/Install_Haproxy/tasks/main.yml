@@ -1,0 +1,25 @@
+---
+# tasks file for Install_Haproxy
+- name: Change hostname
+  hostname: 
+    name: '{{inventory_hostname}}'
+
+- name: Install HAProxy
+  yum: 
+    name: 
+        - haproxy 
+        - pacemaker
+        - pcs
+        - resource-agents
+    state: present
+  register: install
+
+- name: Generate config file
+  template: 
+    src: /etc/ansible/roles/Install_Haproxy/templates/haproxy.j2 
+    dest: /etc/haproxy/haproxy.cfg 
+    mode: 0555
+  when: install|success
+  notify: 
+    - Haproxy start
+    - PCS start

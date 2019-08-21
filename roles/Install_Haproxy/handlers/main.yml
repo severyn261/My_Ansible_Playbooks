@@ -1,0 +1,7 @@
+---
+# handlers file for Install_Haproxy
+- name: Haproxy start
+  service: name=haproxy state=started enabled=yes
+
+- name: PCS start
+  service: name=pcsd state=started enabled=yes
